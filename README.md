@@ -1,5 +1,3 @@
-# dodo
-
 ### bootapp install
 ```sh
 wget https://github.com/yejune/bootapp/raw/0.2.21/bootapp.phar
@@ -20,4 +18,3 @@ bootapp task composer install
 #키체인 접근 > 로그인 > local.com > 정보 가져오기 > 신뢰: 항상신뢰 적용.
 bootapp up
 ```
-
