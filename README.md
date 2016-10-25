@@ -21,3 +21,4 @@ bootapp up
 
 ### 브라우저 확인
 - https://local.com
+- https://local.com/info.php
