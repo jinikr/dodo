@@ -18,3 +18,6 @@ bootapp task composer install
 #키체인 접근 > 로그인 > local.com > 정보 가져오기 > 신뢰: 항상신뢰 적용.
 bootapp up
 ```
+
+### 브라우저 확인
+- https://local.com
