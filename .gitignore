@@ -1,0 +1,13 @@
+.composer
+.migration
+.docker
+.vagrant
+.template
+.bash*
+.ssl
+.docker-compose
+docker-compose*
+composer.lock
+vendor
+var
+test

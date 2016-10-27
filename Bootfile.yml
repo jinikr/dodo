@@ -1,0 +1,93 @@
+project_name: skeleton
+stage_name: local
+services:
+  mysql:
+    container_name: mysql
+    image: yejune/mysql
+    volumes:
+      - './var/mysql/skeleton:/var/lib/mysql'
+    expose:
+      - '3306'
+    environment:
+  webserver:
+    container_name: webserver
+    image: yejune/webserver
+    expose:
+      - '80'
+    volumes:
+      - '.:/var/www'
+      - './var/log/nginx:/var/log/nginx'
+      - './var/certs:/var/certs'
+    links:
+      - mysql
+      - memcached
+      - redis
+    working_dir: /var/www
+    environment:
+      USE_SSL: only
+  memcached:
+    container_name: memcached
+    image: jinwoo/memcached:1.4.25
+    expose:
+      - '11211'
+  redis:
+    container_name: redis
+    image: jinwoo/redis:3.2.0
+    expose:
+      - '6379'
+  beanstalk:
+    container_name: beanstalk
+    image: jinwoo/beanstalk:1.10
+    expose:
+      - '11300'
+stages:
+  local:
+    services:
+      mysql:
+        environment:
+          MYSQL_URL: 'mysql://user:pass@mysql:3306'
+          MYSQL_ROOT_PASSWORD: root
+          DOMAIN: mysql.local.com
+          INITDB: |
+            CREATE DATABASE IF NOT EXISTS `api`;
+            CREATE DATABASE IF NOT EXISTS `pms`;
+            CREATE DATABASE IF NOT EXISTS `user`;
+      webserver:
+        environment:
+          DOMAIN: local.com
+          STAGE_NAME: local
+          DEBUG: 1
+          DATABASE_URL:
+            api: mysql://root:root@mysql:3306/api
+            pms: mysql://root:root@mysql:3306/pms
+            user: mysql://root:root@mysql:3306/user
+      memcached:
+        environment:
+#          MEMCACHED_USERNAME: root
+#          MEMCACHED_PASSWORD: passwd
+  production:
+    services:
+      mysql:
+        environment:
+          MYSQL_URL: 'mysql://user:pass@mysql:3306/apiserver'
+          MYSQL_ROOT_PASSWORD: root
+          DOMAIN: mysql.production.com
+      webserver:
+        environment:
+          DOMAIN: production.com
+          STAGE_NAME: production
+          DEBUG: 0
+        environment_from:
+          mysql:
+            - 'MYSQL_URL:MYSQL_MASTER_URL'
+            - 'MYSQL_URL:MYSQL_SLAVE_URL'
+tasks:
+  composer:
+    container: webserver
+    cmd: composer
+  phinx:
+    container: webserver
+    cmd: vendor/bin/phinx
+  devtools:
+    container: webserver
+    cmd: vendor/bin/phalcon.php
