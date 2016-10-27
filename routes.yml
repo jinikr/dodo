@@ -1,3 +1,2 @@
   get: \App\Controllers\Index->index
   get info: \App\Controllers\Index->info
-
